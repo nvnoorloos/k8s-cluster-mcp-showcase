@@ -1,0 +1,55 @@
+# Demo pod that varies CPU and memory usage over time.
+# Used by the showcase script to create metrics for the dashboard.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mcp-showcase-pod
+  namespace: default
+  labels:
+    app: mcp-showcase
+spec:
+  containers:
+    - name: workload
+      image: python:3.12-slim
+      resources:
+        requests:
+          cpu: 100m
+          memory: 64Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+      command: ["python3", "-c"]
+      args:
+        - |
+          import time, random, math
+
+          data = []
+          MAX_BLOCKS = 200  # Cap at ~200 MB to stay within limits
+          phase = 0
+
+          while True:
+              phase += 1
+
+              # Alternate between high and low memory phases
+              if phase % 2 == 0:
+                  target = random.randint(100, MAX_BLOCKS)
+              else:
+                  target = random.randint(5, 30)
+              while len(data) < target:
+                  data.append(b'\x00' * 1024 * 1024)  # 1 MB blocks
+              while len(data) > target:
+                  data.pop()
+
+              # CPU: alternate between intense bursts and idle
+              if phase % 2 == 0:
+                  duration = random.uniform(2.0, 4.0)
+                  end = time.time() + duration
+                  while time.time() < end:
+                      math.factorial(random.randint(500, 2000))
+              else:
+                  duration = random.uniform(0.1, 0.3)
+                  end = time.time() + duration
+                  while time.time() < end:
+                      sum(range(1000))
+
+              time.sleep(random.uniform(1.0, 3.0))

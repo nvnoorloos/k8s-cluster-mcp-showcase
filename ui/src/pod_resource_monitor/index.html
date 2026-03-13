@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Pod Resource Monitor</title>
+</head>
+<body>
+  <main class="main">
+    <!-- Header with title and live status indicator -->
+    <header class="header">
+      <h1 class="title">Pod Resource Monitor</h1>
+      <div class="header-controls">
+        <span class="status">
+          <span id="status-indicator" class="status-indicator"></span>
+          <span id="status-text" class="status-text">Connecting…</span>
+        </span>
+      </div>
+    </header>
+
+    <!-- Pod selector: populated by calling the list_running_pods tool -->
+    <section class="selector-section">
+      <h2 class="section-title">Select Pod</h2>
+      <div class="selector-row">
+        <select id="pod-select" class="pod-select" disabled>
+          <option value="">Loading pods…</option>
+        </select>
+        <div class="selector-actions">
+          <button id="optimize-button" class="optimize-button" type="button" disabled>
+            Optimize pod resources
+          </button>
+          <span id="pod-count" class="pod-count"></span>
+        </div>
+      </div>
+    </section>
+
+    <div id="optimization-container"></div>
+
+    <!-- Live metrics: updated every second by polling get_pod_metrics_tool -->
+    <div id="metrics-container"></div>
+
+    <!-- Error messages -->
+    <div id="error-container"></div>
+  </main>
+
+  <script type="module" src="./app.ts"></script>
+</body>
+</html>

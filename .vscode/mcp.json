@@ -1,0 +1,8 @@
+{
+	"servers": {
+		"k8s-cluster-mcp": {
+			"url": "http://localhost:8000/mcp",
+			"type": "http"
+		}
+	}
+}

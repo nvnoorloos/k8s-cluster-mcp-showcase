@@ -1,0 +1,60 @@
+# Deployment and Service for the k8s-cluster-mcp server.
+# Runs the MCP server as a pod with access to the Kubernetes API.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-cluster-mcp
+  namespace: default
+  labels:
+    app: k8s-cluster-mcp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8s-cluster-mcp
+  template:
+    metadata:
+      labels:
+        app: k8s-cluster-mcp
+    spec:
+      serviceAccountName: k8s-cluster-mcp
+      containers:
+        - name: mcp-server
+          image: k8s-cluster-mcp:latest
+          imagePullPolicy: Never  # Image is loaded directly into kind
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: k8s-cluster-mcp
+  namespace: default
+spec:
+  selector:
+    app: k8s-cluster-mcp
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+  type: ClusterIP
